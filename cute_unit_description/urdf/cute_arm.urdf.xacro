@@ -1,0 +1,561 @@
+<robot
+  name="cute_300es" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  
+  <xacro:include filename="$(find cute_model)/robots/materials.xacro" />
+  
+  <xacro:include filename="$(find cute_model)/robots/cute_model.gazebo" />
+  
+  <xacro:include filename="$(find cute_model)/robots/cute_transmission.xacro" />
+  
+  <xacro:property name="PI" value="3.1415926535897931"/>
+  <xacro:property name="horizontal_joint_limit" value="2.5"/>
+  <xacro:property name="vertical_joint_limit" value="1.8"/>
+  
+  <link
+    name="cute_base_link">
+    <inertial>
+      <origin
+        xyz="-0.00099787 0.019958 0.22081"
+        rpy="0 0 0" />
+      <mass
+        value="9.0546" />
+      <inertia
+        ixx="0.23138"
+        ixy="0.00045611"
+        ixz="-0.0096898"
+        iyy="0.23735"
+        iyz="-0.0083689"
+        izz="0.059867" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://cute_model/meshes/cute_300es/base_link.STL" />
+      </geometry>
+      <material name="gray"/>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://cute_model/meshes/cute_300es/base_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="part1">
+    <inertial>
+      <origin
+        xyz="0.0011123 -0.017941 0.13361"
+        rpy="0 0 0" />
+      <mass
+        value="9.0546" />
+      <inertia
+        ixx="0.23138"
+        ixy="0.00045611"
+        ixz="0.0096898"
+        iyy="0.23735"
+        iyz="0.0083689"
+        izz="0.059867" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://cute_model/meshes/cute_300es/part1.STL" />
+      </geometry>
+      <material name="yellow"/>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://cute_model/meshes/cute_300es/part1.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="joint1"
+    type="revolute">
+    <origin
+      xyz="0.00011439 0.0020169 0.0872"
+      rpy="0 0 ${PI}" />
+    <parent
+      link="cute_base_link" />
+    <child
+      link="part1" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="${-1*horizontal_joint_limit}"
+      upper="${horizontal_joint_limit}"
+      effort="120"
+      velocity="4.0" />
+  </joint>
+  <link
+    name="part2">
+    <inertial>
+      <origin
+        xyz="-0.00099787 0.018042 0.070815"
+        rpy="0 0 0" />
+      <mass
+        value="9.0546" />
+      <inertia
+        ixx="0.23138"
+        ixy="0.00045611"
+        ixz="-0.0096898"
+        iyy="0.23735"
+        iyz="-0.0083689"
+        izz="0.059867" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://cute_model/meshes/cute_300es/part2.STL" />
+      </geometry>
+      <material name="gray"/>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://cute_model/meshes/cute_300es/part2.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="joint2"
+    type="revolute">
+    <origin
+      xyz="0.00011439 0.0001016 0.0628"
+      rpy="0 0 ${-PI}" />
+    <parent
+      link="part1" />
+    <child
+      link="part2" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="${-1*vertical_joint_limit}"
+      upper="${vertical_joint_limit}"
+      effort="120"
+      velocity="4.0" />
+  </joint>
+  <link
+    name="part3">
+    <inertial>
+      <origin
+        xyz="-0.00099787 0.018033 -0.0060119"
+        rpy="0 0 0" />
+      <mass
+        value="9.0546" />
+      <inertia
+        ixx="0.23138"
+        ixy="0.00045611"
+        ixz="-0.0096898"
+        iyy="0.23735"
+        iyz="-0.0083689"
+        izz="0.059867" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://cute_model/meshes/cute_300es/part3.STL" />
+      </geometry>
+      <material name="yellow"/>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://cute_model/meshes/cute_300es/part3.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="joint3"
+    type="revolute">
+    <origin
+      xyz="0 0 0.076827"
+      rpy="0 0 0" />
+    <parent
+      link="part2" />
+    <child
+      link="part3" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="${-1*horizontal_joint_limit}"
+      upper="${horizontal_joint_limit}"
+      effort="120"
+      velocity="4.0" />
+  </joint>
+  <link
+    name="part4">
+    <inertial>
+      <origin
+        xyz="-0.00099787 0.016583 -0.054842"
+        rpy="0 0 0" />
+      <mass
+        value="9.0546" />
+      <inertia
+        ixx="0.23138"
+        ixy="0.00045611"
+        ixz="-0.0096898"
+        iyy="0.23735"
+        iyz="-0.0083689"
+        izz="0.059867" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://cute_model/meshes/cute_300es/part4.STL" />
+      </geometry>
+      <material name="gray"/>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://cute_model/meshes/cute_300es/part4.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="joint4"
+    type="revolute">
+    <origin
+      xyz="0 0.00145 0.04883"
+      rpy="0 0 0" />
+    <parent
+      link="part3" />
+    <child
+      link="part4" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="${-1*vertical_joint_limit}"
+      upper="${vertical_joint_limit}"
+      effort="120"
+      velocity="4.0" />
+  </joint>
+  <link
+    name="part5">
+    <inertial>
+      <origin
+        xyz="0.016583 0.0024479 -0.12147"
+        rpy="0 0 0" />
+      <mass
+        value="9.0546" />
+      <inertia
+        ixx="0.23735"
+        ixy="-0.00045611"
+        ixz="-0.0083689"
+        iyy="0.23138"
+        iyz="0.0096898"
+        izz="0.059867" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://cute_model/meshes/cute_300es/part5.STL" />
+      </geometry>
+      <material name="yellow"/>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://cute_model/meshes/cute_300es/part5.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="joint5"
+    type="revolute">
+    <origin
+      xyz="0.00145 0 0.06663"
+      rpy="0 0 ${PI/2}" />
+    <parent
+      link="part4" />
+    <child
+      link="part5" />
+    <axis
+      xyz="0 -1 0" />
+    <limit
+      lower="${-1*vertical_joint_limit}"
+      upper="${vertical_joint_limit}"
+      effort="120"
+      velocity="4.0" />
+  </joint>
+  <link
+    name="part6">
+    <inertial>
+      <origin
+        xyz="-0.0060236 0.014097 -0.1881"
+        rpy="0 0 0" />
+      <mass
+        value="9.0546" />
+      <inertia
+        ixx="0.23194"
+        ixy="0.0017997"
+        ixz="-0.0073867"
+        iyy="0.23679"
+        iyz="-0.010458"
+        izz="0.059867" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://cute_model/meshes/cute_300es/part6.STL" />
+      </geometry>
+      <material name="gray"/>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://cute_model/meshes/cute_300es/part6.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="joint6"
+    type="revolute">
+    <origin
+      xyz="0.00145 0 0.06663"
+      rpy="0 0 -1.8142" />
+    <parent
+      link="part5" />
+    <child
+      link="part6" />
+    <axis
+      xyz="-0.24105 0.97051 0" />
+    <limit
+      lower="${-1*vertical_joint_limit}"
+      upper="${vertical_joint_limit}"
+      effort="120"
+      velocity="4.0" />
+  </joint>
+  <link
+    name="part7">
+    <inertial>
+      <origin
+        xyz="-0.015257 -0.0014931 -0.2151"
+        rpy="0 0 0" />
+      <mass
+        value="9.0546" />
+      <inertia
+        ixx="0.23739"
+        ixy="-7.8505E-05"
+        ixz="0.0077441"
+        iyy="0.23135"
+        iyz="-0.010196"
+        izz="0.059867" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://cute_model/meshes/cute_300es/part7.STL" />
+      </geometry>
+      <material name="gray"/>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://cute_model/meshes/cute_300es/part7.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="joint7"
+    type="revolute">
+    <origin
+      xyz="0 0 0.027"
+      rpy="0 0 -1.2645" />
+    <parent
+      link="part6" />
+    <child
+      link="part7" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="${-1*horizontal_joint_limit}"
+      upper="${horizontal_joint_limit}"
+      effort="120"
+      velocity="4.0" />
+  </joint>
+  <link
+    name="claw1">
+    <inertial>
+      <origin
+        xyz="-0.0083363 -0.010453 0"
+        rpy="0 0 0" />
+      <mass
+        value="0.0089253" />
+      <inertia
+        ixx="2.2065E-06"
+        ixy="4.2939E-07"
+        ixz="-6.4162E-22"
+        iyy="1.3936E-06"
+        iyz="-2.39E-21"
+        izz="1.5605E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://cute_model/meshes/cute_300es/claw1.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.55294 0.75294 0.55294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://cute_model/meshes/cute_300es/claw1.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="claw"
+    type="prismatic">
+    <origin
+      xyz="0.00075017 0.011926 0.1118"
+      rpy="${PI/2} 0 -1.6336" />
+    <parent
+      link="part7" />
+    <child
+      link="claw1" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="-0.01"
+      upper="0.01"
+      effort="30"
+      velocity="0.005" />
+  </joint>
+  <link
+    name="claw2">
+    <inertial>
+      <origin
+        xyz="-0.0083363 -0.010453 1.3878E-17"
+        rpy="0 0 0" />
+      <mass
+        value="0.0089253" />
+      <inertia
+        ixx="2.2065E-06"
+        ixy="4.2939E-07"
+        ixz="-1.4504E-21"
+        iyy="1.3936E-06"
+        iyz="-2.2066E-21"
+        izz="1.5605E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://cute_model/meshes/cute_300es/claw2.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.55294 0.75294 0.55294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://cute_model/meshes/cute_300es/claw2.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="claw_pris2"
+    type="prismatic">
+    <origin
+      xyz="-0.00075017 -0.011926 0.1118"
+      rpy="${PI/2} 0 1.508" />
+    <parent
+      link="part7" />
+    <child
+      link="claw2" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="-0.01"
+      upper="0.01"
+      effort="30"
+      velocity="0.005" />
+    <mimic 
+      joint="claw"
+      multiplier="1" 
+      offset="0"/>
+  </joint>
+
+  <link name="end_link"/>
+  
+  <joint name="end_joint" type="fixed">
+    <origin
+      xyz="0 0 0.1118"
+      rpy="0 0 0" />
+    <parent
+      link="part7" />
+    <child
+      link="end_link" />
+  </joint>
+  
+</robot>
