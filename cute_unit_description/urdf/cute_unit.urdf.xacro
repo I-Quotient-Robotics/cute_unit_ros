@@ -16,7 +16,7 @@
         <mesh filename="package://cute_unit_description/mesh/cute_unit_base.stl" />
       </geometry>
       <material name="">
-        <color rgba="0.6 0.6 0.6 1" />
+        <color rgba="0.2 0.2 0.2 1.0" />
       </material>
     </visual>
   </link>
@@ -31,7 +31,7 @@
   <!-- cute arm -->
   <cute_300es/>
   <joint name="arm_joint" type="fixed">
-    <origin xyz="-0.145 0 0.0335" rpy="0 0 -${M_PI/2}" />
+    <origin xyz="-0.145 0 0.0335" rpy="0 0 0" />
     <parent link="base_link"/>
     <child link="cute_base_link"/>
   </joint>

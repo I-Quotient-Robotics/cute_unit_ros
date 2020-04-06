@@ -2,19 +2,30 @@
 <launch>
   <arg name="log_type" default="screen"/>
 
-  <arg name="marker_id" default="423" />
-  <arg name="marker_size" default="0.05"/>
+  <arg name="marker_id" default="576" />
+  <arg name="marker_size" default="0.02"/>
 
   <param name="robot_description" command="$(find xacro)/xacro --inorder $(find cute_unit_description)/urdf/cute_unit.urdf.xacro" />
 
+  <node pkg="nodelet" type="nodelet" name="standalone_nodelet"  args="manager"/>
+  <node pkg="nodelet" type="nodelet" name="depth_image_proc" args="load depth_image_proc/point_cloud_xyzrgb standalone_nodelet" output="screen">
+    <remap from="rgb/camera_info" to="/color/camera_info" />
+    <remap from="rgb/image_rect_color" to="/color/image_raw" />
+    <remap from="depth_registered/image_rect" to="/aligned_depth_to_color/image_raw" />
+  </node>
+
+  <!-- cute arm -->
+  <include file="$(find cute_unit_base)/launch/cute_arm.launch.xml" />
+
   <!-- realsense -->
-  <param name="stereo_module/emitter_enabled" value="1"/>
+  <!-- <param name="stereo_module/emitter_enabled" value="1"/> -->
   <include file="$(find realsense2_camera)/launch/includes/nodelet.launch.xml">
     <arg name="tf_prefix" value="camera"/>
-    <arg name="initial_reset" value="true"/>
+    <arg name="align_depth" value="true"/>
     <arg name="enable_sync" value="true"/>
     <arg name="enable_depth" value="true"/>
-    <arg name="align_depth" value="true"/>
+    <arg name="initial_reset" value="true"/>
+    <!-- <arg name="enable_pointcloud" value="true"/> -->
   </include>
 
   <node pkg="aruco_ros" type="single" name="aruco_marker_detect_node" output="$(arg log_type)">
@@ -29,7 +40,7 @@
     <param name="corner_refinement"  value="LINES" />
   </node>
 
-  <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" output="$(arg log_type)" />
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" output="$(arg log_type)" />
 
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find cute_unit_viz)/viz/view.rviz" output="$(arg log_type)" />
 </launch>
