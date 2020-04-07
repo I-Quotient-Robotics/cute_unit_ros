@@ -16,23 +16,22 @@
 #include <pcl/segmentation/sac_segmentation.h>
 #include <pcl/segmentation/extract_clusters.h>
 
-ObjectDetect::ObjectDetect(ros::NodeHandle *nh) : node_handle_(nh) {
-  point_cloud_sub_ = node_handle_->subscribe ("/depth_registered/points", 1, &ObjectDetect::PointCloudCB, this);
-  debug_pointcloud_pub_ = node_handle_->advertise<sensor_msgs::PointCloud2> ("obj_recognition/debug",1);
+ObjectDetect::ObjectDetect(ros::NodeHandle *nh, ros::NodeHandle *pnh) : node_handle_(nh), private_node_handle_(pnh) {
+  private_node_handle_->param<std::string>("point_cloud_frame", point_cloud_frame_, "");
+  private_node_handle_->param<std::string>("point_cloud_topic", point_cloud_topic_, "/depth/pointcloud");
+  private_node_handle_->param<std::string>("debug_output_topic", debug_output_topic_, "/debug_pointcloud_output");
+  private_node_handle_->param<std::string>("object_visual_markers_topic", object_visual_markers_topic_, "/object_visual_markers");
 
-  object_markers_pub_.reset(new rviz_visual_tools::RvizVisualTools("camera_depth_optical_frame", "/rviz_visual_tools"));
-  object_markers_pub_->loadMarkerPub();
+  point_cloud_sub_ = node_handle_->subscribe (point_cloud_topic_, 1, &ObjectDetect::PointCloudCB, this);
+  debug_pointcloud_pub_ = node_handle_->advertise<sensor_msgs::PointCloud2> (debug_output_topic_, 1);
 
-  object_markers_pub_->deleteAllMarkers();
-  object_markers_pub_->enableBatchPublishing();
+  object_visual_markers_pub_.reset(new rviz_visual_tools::RvizVisualTools(point_cloud_frame_, object_visual_markers_topic_));
+  object_visual_markers_pub_->loadMarkerPub();
+  object_visual_markers_pub_->deleteAllMarkers();
+  object_visual_markers_pub_->enableBatchPublishing();
 }
 
 void ObjectDetect::PointCloudCB(const sensor_msgs::PointCloud2ConstPtr& cloud_msg) {
-  Eigen::Isometry3d pose1 = Eigen::Isometry3d::Identity();
-  Eigen::Isometry3d pose2 = Eigen::Isometry3d::Identity();
-  object_markers_pub_->deleteAllMarkers();
-  object_markers_pub_->publishWireframeCuboid(pose1, 0.02, 0.03, 0.04, rviz_visual_tools::GREEN);
-
   pcl::PCLPointCloud2 debugPCL;
   sensor_msgs::PointCloud2 debug_output;
 
@@ -48,7 +47,7 @@ void ObjectDetect::PointCloudCB(const sensor_msgs::PointCloud2ConstPtr& cloud_ms
   // Perform voxel grid downsampling filtering
   pcl::VoxelGrid<pcl::PCLPointCloud2> sor;
   sor.setInputCloud (cloudPtr);
-  sor.setLeafSize (0.01, 0.01, 0.01);
+  sor.setLeafSize (0.005, 0.005, 0.005);
   sor.filter (*cloudFilteredPtr);
 
   pcl::PointCloud<pcl::PointXYZRGB> *xyz_cloud = new pcl::PointCloud<pcl::PointXYZRGB>;
@@ -82,12 +81,11 @@ void ObjectDetect::PointCloudCB(const sensor_msgs::PointCloud2ConstPtr& cloud_ms
 
   // pcl::toPCLPointCloud2( *xyzCloudPtrFiltered ,debugPCL);
   // pcl_conversions::fromPCL(debugPCL, debug_output);
-  // m_debugPub.publish(debug_output);
+  // debug_pointcloud_pub_.publish(debug_output);
 
   // create a pcl object to hold the ransac filtered results
   pcl::PointCloud<pcl::PointXYZRGB> *xyz_cloud_ransac_filtered = new pcl::PointCloud<pcl::PointXYZRGB>;
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr xyzCloudPtrRansacFiltered (xyz_cloud_ransac_filtered);
-
 
   // perform ransac planar filtration to remove table top
   pcl::ModelCoefficients::Ptr coefficients (new pcl::ModelCoefficients);
@@ -128,28 +126,23 @@ void ObjectDetect::PointCloudCB(const sensor_msgs::PointCloud2ConstPtr& cloud_ms
   pcl::EuclideanClusterExtraction<pcl::PointXYZRGB> ec;
   // specify euclidean cluster parameters
   ec.setClusterTolerance (0.02); // 2cm
-  ec.setMinClusterSize (18);
+  ec.setMinClusterSize (50);
   ec.setMaxClusterSize (25000);
   ec.setSearchMethod (tree);
   ec.setInputCloud (xyzCloudPtrRansacFiltered);
   // exctract the indices pertaining to each cluster and store in a vector of pcl::PointIndices
   ec.extract (cluster_indices);
 
-  // declare an instance of the SegmentedClustersArray message
-  // obj_recognition::SegmentedClustersArray CloudClusters;
-
   // declare the output variable instances
   sensor_msgs::PointCloud2 output;
-  sensor_msgs::PointCloud2 outputs[7];
   pcl::PCLPointCloud2 outputPCL;
 
   // ROS_INFO_STREAM(cluster_indices.size());
-  int i=0;
+  Eigen::Isometry3d top_pose = Eigen::Isometry3d::Identity();
+  Eigen::Isometry3d centroid_pose = Eigen::Isometry3d::Identity();
+  object_visual_markers_pub_->deleteAllMarkers();
   // here, cluster_indices is a vector of indices for each cluster. iterate through each indices object to work with them seporately
   for (std::vector<pcl::PointIndices>::const_iterator it = cluster_indices.begin (); it != cluster_indices.end (); ++it) {
-
-    // create a new clusterData message object
-    //obj_recognition::ClusterData clusterData;
 
     // create a pcl object to hold the extracted cluster
     pcl::PointCloud<pcl::PointXYZRGB> *cluster = new pcl::PointCloud<pcl::PointXYZRGB>;
@@ -167,12 +160,10 @@ void ObjectDetect::PointCloudCB(const sensor_msgs::PointCloud2ConstPtr& cloud_ms
     Eigen::Vector4f minPoint, maxPoint;
     pcl::getMinMax3D(*clusterPtr, minPoint, maxPoint);
 
-    // ROS_INFO("%lf, %lf, %lf, %lf", centroid[0], centroid[1], centroid[2], centroid[3]);
-    pose1.translation() << (maxPoint[0]+minPoint[0])/2.0, (maxPoint[1]+minPoint[1])/2.0, minPoint[2];
-    pose2.translation() << (maxPoint[0]+minPoint[0])/2.0, (maxPoint[1]+minPoint[1])/2.0, (maxPoint[2]+minPoint[2])/2.0;
-    // object_markers_pub_->publishWireframeCuboid(pose1, 0.02, 0.03, 0.04, rviz_visual_tools::GREEN);
-    object_markers_pub_->publishWireframeCuboid(pose2, maxPoint[0]-minPoint[0], maxPoint[1]-minPoint[1], maxPoint[2]-minPoint[2], rviz_visual_tools::GREEN);
-    object_markers_pub_->publishAxis(pose1);
+    top_pose.translation() << (maxPoint[0]+minPoint[0])/2.0, (maxPoint[1]+minPoint[1])/2.0, minPoint[2];
+    centroid_pose.translation() << (maxPoint[0]+minPoint[0])/2.0, (maxPoint[1]+minPoint[1])/2.0, (maxPoint[2]+minPoint[2])/2.0;
+    object_visual_markers_pub_->publishAxis(top_pose);
+    object_visual_markers_pub_->publishWireframeCuboid(centroid_pose, maxPoint[0]-minPoint[0], maxPoint[1]-minPoint[1], maxPoint[2]-minPoint[2], rviz_visual_tools::GREEN);
 
     // log the position of the cluster
     //clusterData.position[0] = (*cloudPtr).data[0];
@@ -186,16 +177,7 @@ void ObjectDetect::PointCloudCB(const sensor_msgs::PointCloud2ConstPtr& cloud_ms
 
     // Convert to ROS data type
     pcl_conversions::fromPCL(outputPCL, output);
-
-    // add the cluster to the array message
-    //clusterData.cluster = output;
-    // CloudClusters.clusters.push_back(output);
-
-    if(i<7) {
-      outputs[i] = output;
-      i++;
-    }
   }
 
-  object_markers_pub_->trigger();
+  object_visual_markers_pub_->trigger();
 }

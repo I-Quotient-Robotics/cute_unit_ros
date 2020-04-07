@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="log_type" default="screen"/>
+
+  <node pkg="cute_unit_app" type="object_detect_node" name="object_detect_node" output="$(arg log_type)">
+    <param name="point_cloud_frame" value="camera_depth_optical_frame" />
+    <param name="point_cloud_topic" value="/depth/color/points" />
+    <param name="debug_output_topic" value="/debug_pointcloud_output" />
+    <param name="object_visual_markers_topic" value="/object_visual_markers" />
+  </node>
+</launch>

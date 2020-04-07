@@ -364,7 +364,7 @@
     <child
       link="part6" />
     <axis
-      xyz="-0.24105 0.97051 0" />
+      xyz="0 1.0 0" />
     <limit
       lower="${-1*vertical_joint_limit}"
       upper="${vertical_joint_limit}"
@@ -393,7 +393,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://cute_model/meshes/cute_300es/part7.STL" />
+          filename="package://cute_model/meshes/cute_300es/part7_fix.STL" />
       </geometry>
       <material name="gray"/>
     </visual>
@@ -403,7 +403,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://cute_model/meshes/cute_300es/part7.STL" />
+          filename="package://cute_model/meshes/cute_300es/part7_fix.STL" />
       </geometry>
     </collision>
   </link>
@@ -469,8 +469,8 @@
     name="claw"
     type="prismatic">
     <origin
-      xyz="0.00075017 0.011926 0.1118"
-      rpy="${PI/2} 0 -1.6336" />
+      xyz="0.0 0.011926 0.1118"
+      rpy="${PI/2} 0 ${-PI/2}" />
     <parent
       link="part7" />
     <child
@@ -527,8 +527,8 @@
     name="claw_pris2"
     type="prismatic">
     <origin
-      xyz="-0.00075017 -0.011926 0.1118"
-      rpy="${PI/2} 0 1.508" />
+      xyz="-0.0 -0.011926 0.1118"
+      rpy="${PI/2} 0 ${PI/2}" />
     <parent
       link="part7" />
     <child

@@ -7,12 +7,12 @@
 
   <param name="robot_description" command="$(find xacro)/xacro --inorder $(find cute_unit_description)/urdf/cute_unit.urdf.xacro" />
 
-  <node pkg="nodelet" type="nodelet" name="standalone_nodelet"  args="manager"/>
+<!--   <node pkg="nodelet" type="nodelet" name="standalone_nodelet"  args="manager"/>
   <node pkg="nodelet" type="nodelet" name="depth_image_proc" args="load depth_image_proc/point_cloud_xyzrgb standalone_nodelet" output="screen">
     <remap from="rgb/camera_info" to="/color/camera_info" />
     <remap from="rgb/image_rect_color" to="/color/image_raw" />
     <remap from="depth_registered/image_rect" to="/aligned_depth_to_color/image_raw" />
-  </node>
+  </node> -->
 
   <!-- cute arm -->
   <include file="$(find cute_unit_base)/launch/cute_arm.launch.xml" />
@@ -25,7 +25,7 @@
     <arg name="enable_sync" value="true"/>
     <arg name="enable_depth" value="true"/>
     <arg name="initial_reset" value="true"/>
-    <!-- <arg name="enable_pointcloud" value="true"/> -->
+    <arg name="enable_pointcloud" value="true"/>
   </include>
 
   <node pkg="aruco_ros" type="single" name="aruco_marker_detect_node" output="$(arg log_type)">

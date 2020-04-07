@@ -1,0 +1,11 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: cute_unit_description
+    relative_path: urdf/cute_unit.urdf.xacro
+    xacro_args: "--inorder "
+  SRDF:
+    relative_path: config/cute_unit_xacro.srdf
+  CONFIG:
+    author_name: Ye Tian
+    author_email: ye.tian@iquotient-robotics.com
+    generated_timestamp: 1586251542

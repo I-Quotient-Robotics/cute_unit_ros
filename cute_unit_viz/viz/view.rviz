@@ -6,7 +6,7 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
-        - /PointCloud21
+        - /Realsense1
         - /MarkerArray1/Namespaces1
       Splitter Ratio: 0.638775527
     Tree Height: 466
@@ -250,7 +250,7 @@ Visualization Manager:
           Color: 255; 255; 255
           Color Transformer: RGB8
           Decay Time: 0
-          Enabled: true
+          Enabled: false
           Invert Rainbow: false
           Max Color: 255; 255; 255
           Max Intensity: 4096
@@ -267,7 +267,7 @@ Visualization Manager:
           Unreliable: false
           Use Fixed Frame: true
           Use rainbow: true
-          Value: true
+          Value: false
       Enabled: true
       Name: Realsense
     - Alpha: 1
@@ -282,7 +282,7 @@ Visualization Manager:
       Color: 255; 255; 255
       Color Transformer: RGB8
       Decay Time: 0
-      Enabled: false
+      Enabled: true
       Invert Rainbow: false
       Max Color: 255; 255; 255
       Max Intensity: 4096
@@ -295,14 +295,14 @@ Visualization Manager:
       Size (Pixels): 3
       Size (m): 0.00200000009
       Style: Flat Squares
-      Topic: /obj_recognition/debug
+      Topic: /debug_pointcloud_output
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
-      Value: false
+      Value: true
     - Class: rviz/MarkerArray
       Enabled: true
-      Marker Topic: /rviz_visual_tools
+      Marker Topic: /object_visual_markers
       Name: MarkerArray
       Namespaces:
         {}
@@ -333,25 +333,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 1.10581434
+      Distance: 1.25441241
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.193916172
-        Y: 0.0114613818
-        Z: 0.317529261
+        X: 0.151118606
+        Y: -0.0251775384
+        Z: 0.382555097
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.449796647
+      Pitch: 0.459797084
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 6.1485486
+      Yaw: 5.83854818
     Saved: ~
 Window Geometry:
   Displays:
