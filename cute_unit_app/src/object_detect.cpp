@@ -76,7 +76,7 @@ void ObjectDetect::PointCloudCB(const sensor_msgs::PointCloud2ConstPtr& cloud_ms
 
   pass_z.setInputCloud (xyzCloudPtrFiltered);
   pass_z.setFilterFieldName ("z");
-  pass_z.setFilterLimits (0, 0.55);
+  pass_z.setFilterLimits (0.40, 0.55);
   pass_z.filter (*xyzCloudPtrFiltered);
 
   // pcl::toPCLPointCloud2( *xyzCloudPtrFiltered ,debugPCL);

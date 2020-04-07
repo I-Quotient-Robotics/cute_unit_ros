@@ -8,4 +8,7 @@
     <param name="debug_output_topic" value="/debug_pointcloud_output" />
     <param name="object_visual_markers_topic" value="/object_visual_markers" />
   </node>
+
+  <node pkg="cute_unit_app" type="cute_unit_app_node.py" name="cute_unit_app_node" output="$(arg log_type)">
+  </node>
 </launch>
