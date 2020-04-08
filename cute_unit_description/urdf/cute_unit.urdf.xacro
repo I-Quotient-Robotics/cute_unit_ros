@@ -38,7 +38,7 @@
 
   <!-- realsense -->
   <sensor_d435 parent="base_link" prefix="camera">
-    <origin xyz="0.0365 0 0.577350" rpy="0 ${M_PI/2} 0"/>
+    <origin xyz="0.0365 0 0.572" rpy="0 ${M_PI/2} 0"/>
   </sensor_d435>
 
 </robot>

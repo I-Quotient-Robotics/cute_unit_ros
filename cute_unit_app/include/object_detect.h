@@ -3,6 +3,7 @@
 
 #include <ros/ros.h>
 #include <sensor_msgs/PointCloud2.h>
+#include <geometry_msgs/PoseArray.h>
 #include <rviz_visual_tools/rviz_visual_tools.h>
 
 class ObjectDetect {
@@ -23,6 +24,8 @@ class ObjectDetect {
 
     ros::Subscriber point_cloud_sub_;
     ros::Publisher debug_pointcloud_pub_;
+
+    ros::Publisher object_pub_;
 
     rviz_visual_tools::RvizVisualToolsPtr object_visual_markers_pub_;
 };

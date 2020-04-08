@@ -25,6 +25,8 @@ ObjectDetect::ObjectDetect(ros::NodeHandle *nh, ros::NodeHandle *pnh) : node_han
   point_cloud_sub_ = node_handle_->subscribe (point_cloud_topic_, 1, &ObjectDetect::PointCloudCB, this);
   debug_pointcloud_pub_ = node_handle_->advertise<sensor_msgs::PointCloud2> (debug_output_topic_, 1);
 
+  object_pub_ = node_handle_->advertise<geometry_msgs::PoseArray> ("object_pose", 1);
+
   object_visual_markers_pub_.reset(new rviz_visual_tools::RvizVisualTools(point_cloud_frame_, object_visual_markers_topic_));
   object_visual_markers_pub_->loadMarkerPub();
   object_visual_markers_pub_->deleteAllMarkers();
@@ -141,6 +143,7 @@ void ObjectDetect::PointCloudCB(const sensor_msgs::PointCloud2ConstPtr& cloud_ms
   Eigen::Isometry3d top_pose = Eigen::Isometry3d::Identity();
   Eigen::Isometry3d centroid_pose = Eigen::Isometry3d::Identity();
   object_visual_markers_pub_->deleteAllMarkers();
+  geometry_msgs::PoseArray  pose_array;
   // here, cluster_indices is a vector of indices for each cluster. iterate through each indices object to work with them seporately
   for (std::vector<pcl::PointIndices>::const_iterator it = cluster_indices.begin (); it != cluster_indices.end (); ++it) {
 
@@ -165,6 +168,18 @@ void ObjectDetect::PointCloudCB(const sensor_msgs::PointCloud2ConstPtr& cloud_ms
     object_visual_markers_pub_->publishAxis(top_pose);
     object_visual_markers_pub_->publishWireframeCuboid(centroid_pose, maxPoint[0]-minPoint[0], maxPoint[1]-minPoint[1], maxPoint[2]-minPoint[2], rviz_visual_tools::GREEN);
 
+    geometry_msgs::Pose pose;
+    pose.position.x = top_pose.translation()[0];
+    pose.position.y = top_pose.translation()[1];
+    pose.position.z = top_pose.translation()[2];
+
+    pose.orientation.x = 0;
+    pose.orientation.y = 0;
+    pose.orientation.z = 0;
+    pose.orientation.w = 1;
+
+    pose_array.poses.push_back(pose);
+
     // log the position of the cluster
     //clusterData.position[0] = (*cloudPtr).data[0];
     //clusterData.position[1] = (*cloudPtr).points.back().y;
@@ -178,6 +193,10 @@ void ObjectDetect::PointCloudCB(const sensor_msgs::PointCloud2ConstPtr& cloud_ms
     // Convert to ROS data type
     pcl_conversions::fromPCL(outputPCL, output);
   }
+
+  pose_array.header.stamp = ros::Time::now();
+  pose_array.header.frame_id = point_cloud_frame_;
+  object_pub_.publish(pose_array);
 
   object_visual_markers_pub_->trigger();
 }
