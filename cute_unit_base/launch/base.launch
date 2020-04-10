@@ -2,17 +2,7 @@
 <launch>
   <arg name="log_type" default="screen"/>
 
-  <arg name="marker_id" default="576" />
-  <arg name="marker_size" default="0.02"/>
-
   <param name="robot_description" command="$(find xacro)/xacro --inorder $(find cute_unit_description)/urdf/cute_unit.urdf.xacro" />
-
-<!--   <node pkg="nodelet" type="nodelet" name="standalone_nodelet"  args="manager"/>
-  <node pkg="nodelet" type="nodelet" name="depth_image_proc" args="load depth_image_proc/point_cloud_xyzrgb standalone_nodelet" output="screen">
-    <remap from="rgb/camera_info" to="/color/camera_info" />
-    <remap from="rgb/image_rect_color" to="/color/image_raw" />
-    <remap from="depth_registered/image_rect" to="/aligned_depth_to_color/image_raw" />
-  </node> -->
 
   <!-- cute arm -->
   <include file="$(find cute_unit_base)/launch/cute_arm.launch.xml" />
@@ -27,18 +17,6 @@
     <arg name="initial_reset" value="true"/>
     <arg name="enable_pointcloud" value="true"/>
   </include>
-
-  <node pkg="aruco_ros" type="single" name="aruco_marker_detect_node" output="$(arg log_type)">
-    <remap from="/camera_info" to="/color/camera_info" />
-    <remap from="/image" to="/color/image_raw" />
-    <param name="image_is_rectified" value="True" />
-    <param name="marker_id" value="$(arg marker_id)" />
-    <param name="marker_size" value="$(arg marker_size)" />
-    <param name="reference_frame"    value="" />
-    <param name="camera_frame"       value="camera_color_optical_frame" />
-    <param name="marker_frame"       value="marker_423" />
-    <param name="corner_refinement"  value="LINES" />
-  </node>
 
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" output="$(arg log_type)" />
 

@@ -8,7 +8,6 @@ import moveit_commander
 
 import geometry_msgs.msg
 from std_msgs.msg import Float64
-# from visualization_msgs.msg import MarkerArray
 from dynamixel_controllers.srv import TorqueEnable
 
 
