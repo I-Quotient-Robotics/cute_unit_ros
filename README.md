@@ -49,12 +49,6 @@ ROS package for pick-place training unit, based on cute arm
 
 ## 如何使用
 
-1. 修改串口权限（不一定是ttyUSB0，根据实际情况更改设备符）
-
-   ```shell
-   sudo chmod 777 /dev/ttyUSB0
-   ```
-
 2. 启动机械臂训练单元的驱动
 
    ```shell
