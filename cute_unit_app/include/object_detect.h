@@ -3,8 +3,11 @@
 
 #include <ros/ros.h>
 #include <sensor_msgs/PointCloud2.h>
+#include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/PoseArray.h>
 #include <rviz_visual_tools/rviz_visual_tools.h>
+
+#include "cute_unit_app/GetObject.h"
 
 class ObjectDetect {
   public:
@@ -12,9 +15,12 @@ class ObjectDetect {
 
   private:
     void PointCloudCB(const sensor_msgs::PointCloud2ConstPtr& cloud_msg);
+    bool ObjectRequestCB(cute_unit_app::GetObject::Request &req, cute_unit_app::GetObject::Response &res);
 
     ros::NodeHandle *node_handle_;
     ros::NodeHandle *private_node_handle_;
+
+    geometry_msgs::PoseStamped latest_object_pose_;
 
     std::string point_cloud_frame_;
 
@@ -24,6 +30,7 @@ class ObjectDetect {
 
     ros::Subscriber point_cloud_sub_;
     ros::Publisher debug_pointcloud_pub_;
+    ros::ServiceServer object_request_srv_;
 
     ros::Publisher object_pub_;
 

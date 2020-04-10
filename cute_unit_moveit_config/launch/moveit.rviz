@@ -6,7 +6,7 @@ Panels:
       Expanded:
         - /TF1/Frames1
       Splitter Ratio: 0.742560029
-    Tree Height: 339
+    Tree Height: 167
   - Class: rviz/Help
     Name: Help
   - Class: rviz/Views
@@ -412,14 +412,14 @@ Visualization Manager:
                 camera_accel_optical_frame:
                   {}
               camera_aligned_depth_to_color_frame:
-                camera_color_optical_frame:
-                  {}
+                {}
               camera_aligned_depth_to_infra1_frame:
                 camera_infra1_optical_frame:
                   {}
-              camera_color_frame:
-                {}
               camera_depth_frame:
+                camera_color_frame:
+                  camera_color_optical_frame:
+                    {}
                 camera_depth_optical_frame:
                   {}
                 camera_left_ir_frame:
@@ -457,7 +457,7 @@ Visualization Manager:
     - Class: rviz/Group
       Displays:
         - Class: rviz/Image
-          Enabled: false
+          Enabled: true
           Image Topic: /color/image_raw
           Max Value: 1
           Median window: 5
@@ -467,7 +467,7 @@ Visualization Manager:
           Queue Size: 2
           Transport Hint: raw
           Unreliable: false
-          Value: false
+          Value: true
         - Alpha: 1
           Autocompute Intensity Bounds: true
           Autocompute Value Bounds:
@@ -480,7 +480,7 @@ Visualization Manager:
           Color: 255; 255; 255
           Color Transformer: RGB8
           Decay Time: 0
-          Enabled: false
+          Enabled: true
           Invert Rainbow: false
           Max Color: 255; 255; 255
           Max Intensity: 4096
@@ -497,7 +497,7 @@ Visualization Manager:
           Unreliable: false
           Use Fixed Frame: true
           Use rainbow: true
-          Value: false
+          Value: true
       Enabled: true
       Name: Realsense
     - Class: rviz/Group
@@ -507,8 +507,7 @@ Visualization Manager:
           Marker Topic: /object_visual_markers
           Name: MarkerArray
           Namespaces:
-            Axis: true
-            Wireframe Cuboid: true
+            {}
           Queue Size: 101
           Value: true
         - Alpha: 1
@@ -523,7 +522,7 @@ Visualization Manager:
           Color: 255; 255; 255
           Color Transformer: RGB8
           Decay Time: 0
-          Enabled: true
+          Enabled: false
           Invert Rainbow: false
           Max Color: 255; 255; 255
           Max Intensity: 4096
@@ -540,7 +539,7 @@ Visualization Manager:
           Unreliable: false
           Use Fixed Frame: true
           Use rainbow: true
-          Value: true
+          Value: false
       Enabled: true
       Name: ObjectDetect
     - Alpha: 1
@@ -575,25 +574,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/XYOrbit
-      Distance: 1.00322068
+      Distance: 1.57858717
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.0535728633
-        Y: 0.0793322325
+        X: 0.259859353
+        Y: -0.0341572165
         Z: 1.78814503e-07
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.374797076
+      Pitch: 0.299797088
       Target Frame: base_link
       Value: XYOrbit (rviz)
-      Yaw: 5.95805931
+      Yaw: 5.51805305
     Saved: ~
 Window Geometry:
   Displays:
@@ -609,7 +608,7 @@ Window Geometry:
     collapsed: false
   MotionPlanning - Trajectory Slider:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd0000000100000000000002ad000003dafc0200000008fb000000100044006900730070006c0061007900730100000028000001e8000000d700fffffffb0000000800480065006c00700000000342000000bb0000007300fffffffb0000000a0056006900650077007300000003b0000000b0000000ad00fffffffb0000000c00430061006d00650072006100000002ff000001610000000000000000fb0000001e004d006f00740069006f006e00200050006c0061006e006e0069006e00670100000374000001890000000000000000fb00000044004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000004a00fffffffb0000001c004d006f00740069006f006e0050006c0061006e006e0069006e00670100000216000001ec0000018300fffffffb0000000a0049006d006100670065000000034c000000b60000001600ffffff0000048c000003da00000001000000020000000100000002fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd0000000100000000000002ad000003dafc0200000008fb000000100044006900730070006c00610079007301000000280000013c000000d700fffffffb0000000800480065006c00700000000342000000bb0000007300fffffffb0000000a0056006900650077007300000003b0000000b0000000ad00fffffffb0000000c00430061006d00650072006100000002ff000001610000000000000000fb0000001e004d006f00740069006f006e00200050006c0061006e006e0069006e00670100000374000001890000000000000000fb00000044004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000004a00fffffffb0000001c004d006f00740069006f006e0050006c0061006e006e0069006e0067010000016a0000018e0000018300fffffffb0000000a0049006d00610067006501000002fe000001040000001600ffffff0000048c000003da00000001000000020000000100000002fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Views:
     collapsed: false
   Width: 1855

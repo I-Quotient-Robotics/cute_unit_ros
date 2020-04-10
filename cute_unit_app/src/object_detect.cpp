@@ -27,10 +27,25 @@ ObjectDetect::ObjectDetect(ros::NodeHandle *nh, ros::NodeHandle *pnh) : node_han
 
   object_pub_ = node_handle_->advertise<geometry_msgs::PoseArray> ("object_pose", 1);
 
+  object_request_srv_ = private_node_handle_->advertiseService("request_first_object", &ObjectDetect::ObjectRequestCB, this);
+
   object_visual_markers_pub_.reset(new rviz_visual_tools::RvizVisualTools(point_cloud_frame_, object_visual_markers_topic_));
   object_visual_markers_pub_->loadMarkerPub();
   object_visual_markers_pub_->deleteAllMarkers();
   object_visual_markers_pub_->enableBatchPublishing();
+}
+
+bool ObjectDetect::ObjectRequestCB(cute_unit_app::GetObject::Request &req, cute_unit_app::GetObject::Response &res) {
+  if(req.request_type == 0) {
+    if(ros::Time::now() - latest_object_pose_.header.stamp < ros::Duration(0.5)) {
+      res.object_pose = latest_object_pose_;
+    } else {
+      ROS_INFO("no update for object for %lf", (ros::Time::now()-latest_object_pose_.header.stamp).toSec());
+      return false;
+    }
+  }
+
+  return true;
 }
 
 void ObjectDetect::PointCloudCB(const sensor_msgs::PointCloud2ConstPtr& cloud_msg) {
@@ -119,6 +134,10 @@ void ObjectDetect::PointCloudCB(const sensor_msgs::PointCloud2ConstPtr& cloud_ms
 
   // perform euclidean cluster segmentation to seporate individual objects
 
+  if(xyzCloudPtrRansacFiltered->empty() == true) {
+    return;
+  }
+
   // Create the KdTree object for the search method of the extraction
   pcl::search::KdTree<pcl::PointXYZRGB>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZRGB>);
   tree->setInputCloud (xyzCloudPtrRansacFiltered);
@@ -180,13 +199,6 @@ void ObjectDetect::PointCloudCB(const sensor_msgs::PointCloud2ConstPtr& cloud_ms
 
     pose_array.poses.push_back(pose);
 
-    // log the position of the cluster
-    //clusterData.position[0] = (*cloudPtr).data[0];
-    //clusterData.position[1] = (*cloudPtr).points.back().y;
-    //clusterData.position[2] = (*cloudPtr).points.back().z;
-    //std::string info_string = string(cloudPtr->points.back().x);
-    //printf(clusterData.position[0]);
-
     // convert to pcl::PCLPointCloud2
     pcl::toPCLPointCloud2( *clusterPtr ,outputPCL);
 
@@ -196,6 +208,13 @@ void ObjectDetect::PointCloudCB(const sensor_msgs::PointCloud2ConstPtr& cloud_ms
 
   pose_array.header.stamp = ros::Time::now();
   pose_array.header.frame_id = point_cloud_frame_;
+
+  if(pose_array.poses.size() > 0) {
+    latest_object_pose_.header.stamp = pose_array.header.stamp;
+    latest_object_pose_.header.frame_id = pose_array.header.frame_id;
+    latest_object_pose_.pose = pose_array.poses[0];
+  }
+
   object_pub_.publish(pose_array);
 
   object_visual_markers_pub_->trigger();

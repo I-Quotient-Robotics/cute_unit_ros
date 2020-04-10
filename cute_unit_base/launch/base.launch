@@ -20,5 +20,5 @@
 
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" output="$(arg log_type)" />
 
-  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find cute_unit_viz)/viz/view.rviz" output="$(arg log_type)" />
+  <!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(find cute_unit_viz)/viz/view.rviz" output="$(arg log_type)" /> -->
 </launch>

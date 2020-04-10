@@ -10,14 +10,16 @@ import geometry_msgs.msg
 from std_msgs.msg import Float64
 from dynamixel_controllers.srv import TorqueEnable
 
+from cute_unit_app.srv import GetObject
+
 
 class PickPlace:
     def __init__(self):
-        self.arm_group = moveit_commander.MoveGroupCommander('cute_arm')
-        self.gripper_command_pub = rospy.Publisher('/claw_controller/command', Float64, queue_size=10)
-        self.gripper_torque_service_proxy = rospy.ServiceProxy('/claw_controller/torque_enable', TorqueEnable)
+        self.__arm_group = moveit_commander.MoveGroupCommander('cute_arm')
+        self.__gripper_command_pub = rospy.Publisher('/claw_controller/command', Float64, queue_size=10)
+        self.__gripper_torque_service_proxy = rospy.ServiceProxy('/claw_controller/torque_enable', TorqueEnable)
         rospy.loginfo("arm setup")
-        self.gripper_torque_service_proxy(torque_enable=True)
+        self.__gripper_torque_service_proxy(torque_enable=True)
         self.__set_gripper(False)
         rospy.sleep(1.0)
         self.__set_gripper(True)
@@ -25,14 +27,12 @@ class PickPlace:
         self.__move_by_name('home')
         rospy.sleep(1.0)
 
-        self.object_pose_sub = rospy.Subscriber('/object_pose', geometry_msgs.msg.PoseArray, self.__object_cb)
+        self.__object_service_proxy = rospy.ServiceProxy('/object_detect_node/request_first_object', GetObject)
 
-        self.__object_pose = None
-
-    def __convert_to_transform(self, pose):
-        quaternion = math3d.UnitQuaternion(pose.orientation.w, pose.orientation.x, pose.orientation.y, pose.orientation.z)
+    def __convert_to_transform(self, pose_stamped):
+        quaternion = math3d.UnitQuaternion(pose_stamped.pose.orientation.w, pose_stamped.pose.orientation.x, pose_stamped.pose.orientation.y, pose_stamped.pose.orientation.z)
         transform = math3d.Transform()
-        transform.set_pos((pose.position.x, pose.position.y, pose.position.z))
+        transform.set_pos((pose_stamped.pose.position.x, pose_stamped.pose.position.y, pose_stamped.pose.position.z))
         transform.set_orient(quaternion.orientation)
         return transform
 
@@ -49,71 +49,76 @@ class PickPlace:
 
     def __set_gripper(self, state):
         if state:
-            self.gripper_command_pub.publish(0.0)
+            self.__gripper_command_pub.publish(0.0)
         else:
-            self.gripper_command_pub.publish(-1.0)
+            self.__gripper_command_pub.publish(-1.0)
 
     def __move_by_pose(self, target_pose):
-        self.arm_group.set_pose_target(target_pose)
-        self.arm_group.go(wait=True)
+        self.__arm_group.set_pose_target(target_pose)
+        return self.__arm_group.go(wait=True)
 
     def __move_by_name(self, target_name):
-        self.arm_group.set_named_target(target_name)
-        self.arm_group.go(wait=True)
+        self.__arm_group.set_named_target(target_name)
+        return self.__arm_group.go(wait=True)
 
     def pick_place(self, target_pose):
         pass
 
-    def __object_cb(self, data):
-        # rospy.loginfo("get data")
-        for pose in data.poses:
-            self.__object_pose = pose
-            self.__object_frame_id = data.header.frame_id
-
     def run(self):
-        if self.__object_pose is not None:
-            rospy.loginfo("has object")
-            current_pose = self.__object_pose
-            object_pose_stamped = geometry_msgs.msg.PoseStamped()
-            object_pose_stamped.header.frame_id = self.__object_frame_id
-            object_pose_stamped.pose = current_pose
+        rospy.loginfo("request object pose...")
+        try:
+            res = self.__object_service_proxy(request_type=0)
+        except rospy.ServiceException:
+            rospy.loginfo("no object")
+            return
 
-            object_transform = self.__convert_to_transform(current_pose)
+        rospy.loginfo("found object")
 
-            standby_offset = math3d.Transform()
-            standby_offset.pos = math3d.Vector(0, 0, -0.03)
-            standby_transform = object_transform * standby_offset
-            standby_pose_stamped = self.__convert_to_pose(standby_transform)
-            standby_pose_stamped.header.frame_id = self.__object_frame_id
+        object_transform = self.__convert_to_transform(res.object_pose)
 
-            pick_offset = math3d.Transform()
-            pick_offset.pos = math3d.Vector(0, 0, 0)
-            pick_transform = object_transform * pick_offset
-            pick_pose_stamped = self.__convert_to_pose(pick_transform)
-            pick_pose_stamped.header.frame_id = self.__object_frame_id
+        standby_offset = math3d.Transform()
+        standby_offset.pos = math3d.Vector(0, 0, -0.03)
+        standby_transform = object_transform * standby_offset
+        standby_pose_stamped = self.__convert_to_pose(standby_transform)
+        standby_pose_stamped.header.frame_id = res.object_pose.header.frame_id
 
-            rospy.loginfo("%s, %s, %s", object_pose_stamped.pose.position.x, object_pose_stamped.pose.position.y, object_pose_stamped.pose.position.z)
-            rospy.loginfo("%s, %s, %s", standby_pose_stamped.pose.position.x, standby_pose_stamped.pose.position.y, standby_pose_stamped.pose.position.z)
-            rospy.loginfo("%s, %s, %s", pick_pose_stamped.pose.position.x, pick_pose_stamped.pose.position.y, pick_pose_stamped.pose.position.z)
-            # rospy.loginfo("%s, %s, %s, %s", new_pose.pose.orientation.x, new_pose.pose.orientation.y, new_pose.pose.orientation.z, new_pose.pose.orientation.w)
+        pick_offset = math3d.Transform()
+        pick_offset.pos = math3d.Vector(0, 0, 0)
+        pick_transform = object_transform * pick_offset
+        pick_pose_stamped = self.__convert_to_pose(pick_transform)
+        pick_pose_stamped.header.frame_id = res.object_pose.header.frame_id
 
-            self.__set_gripper(True)
-            rospy.sleep(2.0)
+        rospy.loginfo("object pose: %s, %s, %s", res.object_pose.pose.position.x, res.object_pose.pose.position.y, res.object_pose.pose.position.z)
+        rospy.loginfo("standby pose: %s, %s, %s", standby_pose_stamped.pose.position.x, standby_pose_stamped.pose.position.y, standby_pose_stamped.pose.position.z)
+        # rospy.loginfo("%s, %s, %s", pick_pose_stamped.pose.position.x, pick_pose_stamped.pose.position.y, pick_pose_stamped.pose.position.z)
 
-            self.__move_by_pose(standby_pose_stamped)
-            # rospy.sleep(2.0)
+        self.__set_gripper(True)
+        rospy.sleep(2.0)
 
-            self.__move_by_pose(pick_pose_stamped)
-            # rospy.sleep(2.0)
+        if self.__move_by_pose(standby_pose_stamped) is not True:
+            rospy.loginfo("unable to get standby pose")
+            return
+        # rospy.sleep(2.0)
 
-            self.__set_gripper(False)
-            rospy.sleep(2.0)
+        if self.__move_by_pose(pick_pose_stamped) is not True:
+            rospy.loginfo("unable to get object pose")
+            return
+        # rospy.sleep(2.0)
 
-            self.__move_by_pose(standby_pose_stamped)
-            # rospy.sleep(2.0)
+        self.__set_gripper(False)
+        rospy.sleep(2.0)
 
-            self.__move_by_name('home')
-            # rospy.sleep(2.0)
+        if self.__move_by_pose(standby_pose_stamped) is not True:
+            rospy.loginfo("unable to get standby pose")
+            return
+        # rospy.sleep(2.0)
+
+        if self.__move_by_name('home') is not True:
+            rospy.loginfo("unable to get home pose")
+            return
+        # rospy.sleep(2.0)
+
+        rospy.loginfo("finish")
 
 
 def main():
@@ -122,7 +127,7 @@ def main():
 
     pick_place = PickPlace()
 
-    rate = rospy.Rate(1)
+    rate = rospy.Rate(0.4)
     while not rospy.is_shutdown():
         pick_place.run()
         rate.sleep()
