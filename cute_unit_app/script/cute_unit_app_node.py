@@ -51,7 +51,7 @@ class PickPlace:
         if state:
             self.__gripper_command_pub.publish(0.0)
         else:
-            self.__gripper_command_pub.publish(-1.0)
+            self.__gripper_command_pub.publish(-0.5)
 
     def __move_by_pose(self, target_pose):
         self.__arm_group.set_pose_target(target_pose)
@@ -103,7 +103,7 @@ class PickPlace:
         if self.__move_by_pose(pick_pose_stamped) is not True:
             rospy.loginfo("unable to get object pose")
             return
-        # rospy.sleep(2.0)
+        rospy.sleep(1.0)
 
         self.__set_gripper(False)
         rospy.sleep(2.0)
@@ -116,7 +116,10 @@ class PickPlace:
         if self.__move_by_name('home') is not True:
             rospy.loginfo("unable to get home pose")
             return
-        # rospy.sleep(2.0)
+        rospy.sleep(2.0)
+
+        self.__set_gripper(True)
+        rospy.sleep(2.0)
 
         rospy.loginfo("finish")
 
